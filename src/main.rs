@@ -119,7 +119,7 @@ fn calculate_score(cards: &Vec<Card>) -> Score {
 
 fn draw(deck: &mut Vec<Card>, cards: &mut Vec<Card>) {
     match deck.pop() {
-        None => panic!(),
+        None => unreachable!(),
         Some(c) => cards.push(c),
     }
 }
@@ -189,8 +189,22 @@ fn dealer_turn(deck: &mut Vec<Card>) -> Score {
     }
 }
 
+fn determine_winner(player_score: Score, dealer_score: Score) {
+    match (player_score, dealer_score) {
+        (p, d) if p == d => println!("The game ended in a draw."),
+        (Score::Blackjack, _) => println!("You win!"),
+        (_, Score::Blackjack) => println!("The dealer wins!"),
+        (Score::Bust, _) => println!("You lose!"),
+        (_, Score::Bust) => println!("You win!"),
+        (Score::Value(p), Score::Value(d)) if p > d => println!("You win!"),
+        (Score::Value(p), Score::Value(d)) if p < d => println!("The dealer wins!"),
+        _ => unreachable!()
+    }
+}
+
 fn main() {
     let mut deck = new_deck();
     let player_score = player_turn(&mut deck);
     let dealer_score = dealer_turn(&mut deck);
+    determine_winner(player_score, dealer_score);
 }
