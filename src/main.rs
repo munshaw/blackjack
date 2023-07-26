@@ -32,8 +32,8 @@ enum Score {
 enum Suit {
     Spade,
     Heart,
-    Clubs,
-    Diamonds,
+    Club,
+    Diamond,
 }
 
 #[derive(Debug)]
@@ -65,7 +65,7 @@ fn cards_to_string(cards: &Vec<Card>) -> String {
 }
 
 fn new_deck() -> Vec<Card> {
-    let suits = [Suit::Spade, Suit::Heart, Suit::Clubs, Suit::Diamonds];
+    let suits = [Suit::Spade, Suit::Heart, Suit::Club, Suit::Diamond];
     let ranks = [
         Rank::Ace,
         Rank::Two,
