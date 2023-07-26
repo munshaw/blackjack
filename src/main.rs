@@ -3,7 +3,7 @@ use rand::thread_rng;
 use std::cmp::Ordering;
 use std::io::stdin;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 enum Rank {
     Ace,
     Two,
@@ -20,7 +20,14 @@ enum Rank {
     King,
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+enum Score {
+    Bust,
+    Blackjack,
+    Value(u8),
+}
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
 enum Suit {
     Spade,
     Heart,
@@ -32,13 +39,6 @@ enum Suit {
 struct Card {
     suit: Suit,
     rank: Rank,
-}
-
-#[derive(Debug, Copy, Clone)]
-enum Score {
-    Bust,
-    Blackjack,
-    Value(u8),
 }
 
 impl Card {
@@ -73,6 +73,10 @@ fn new_deck() -> Vec<Card> {
         .for_each(|s| ranks.iter().for_each(|r| deck.push(Card::new(s, r))));
     deck.shuffle(&mut thread_rng());
     deck
+}
+
+fn has_aces(cards: &Vec<Card>) -> bool {
+    cards.iter().any(|c| c.rank == Rank::Ace)
 }
 
 fn calculate_score(cards: &Vec<Card>) -> Score {
@@ -133,18 +137,19 @@ fn is_stay() -> bool {
     }
 }
 
-fn player_turn(deck: &mut Vec<Card>, player_cards: &mut Vec<Card>) -> Score {
+fn player_turn(deck: &mut Vec<Card>) -> Score {
+    let mut player_cards: Vec<Card> = Vec::new();
     loop {
-        draw(deck, player_cards);
-        println!("Your cards: {:#?}", player_cards);
-        let score = calculate_score(player_cards);
+        draw(deck, &mut player_cards);
+        println!("Your cards: {:#?}", &mut player_cards);
+        let score = calculate_score(&mut player_cards);
         match score {
             Score::Bust => {
-                println!("Bust!");
+                println!("You bust!");
                 return score;
             }
             Score::Blackjack => {
-                println!("Blackjack!");
+                println!("You blackjack!");
                 return score;
             }
             Score::Value(v) => {
@@ -157,8 +162,35 @@ fn player_turn(deck: &mut Vec<Card>, player_cards: &mut Vec<Card>) -> Score {
     }
 }
 
+fn dealer_turn(deck: &mut Vec<Card>) -> Score {
+    let mut dealer_cards: Vec<Card> = Vec::new();
+    loop {
+        draw(deck, &mut dealer_cards);
+        println!("Dealer cards: {:#?}", &mut dealer_cards);
+        let score = calculate_score(&mut dealer_cards);
+        match score {
+            Score::Bust => {
+                println!("The dealer busts!");
+                return score;
+            }
+            Score::Blackjack => {
+                println!("The dealer blackjacks!");
+                return score;
+            }
+            Score::Value(v) => {
+                println!("Dealer's score: {}", v);
+                if v == 17 && has_aces(&dealer_cards) || v > 17 {
+                    println!("The dealer stays.");
+                    return score;
+                }
+                println!("The dealer hits.");
+            }
+        };
+    }
+}
+
 fn main() {
     let mut deck = new_deck();
-    let mut player_cards: Vec<Card> = Vec::new();
-    player_turn(&mut deck, &mut player_cards);
+    let player_score = player_turn(&mut deck);
+    let dealer_score = dealer_turn(&mut deck);
 }
