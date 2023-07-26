@@ -1,6 +1,7 @@
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::cmp::Ordering;
+use std::fmt::{Display, Formatter};
 use std::io::stdin;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -48,6 +49,19 @@ impl Card {
             rank: *rank,
         }
     }
+}
+
+impl Display for Card {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?} of {:?}s", self.rank, self.suit)
+    }
+}
+
+fn cards_to_string(cards: &Vec<Card>) -> String {
+    cards.iter().fold(
+        String::new(),
+        |s, c| if s == "" { s } else { s + ", " } + &*c.to_string(),
+    )
 }
 
 fn new_deck() -> Vec<Card> {
@@ -141,7 +155,7 @@ fn player_turn(deck: &mut Vec<Card>) -> Score {
     let mut player_cards: Vec<Card> = Vec::new();
     loop {
         draw(deck, &mut player_cards);
-        println!("Your cards: {:#?}", &mut player_cards);
+        println!("Your cards: {}", cards_to_string(&player_cards));
         let score = calculate_score(&mut player_cards);
         match score {
             Score::Bust => {
@@ -152,12 +166,8 @@ fn player_turn(deck: &mut Vec<Card>) -> Score {
                 println!("You blackjack!");
                 return score;
             }
-            Score::Value(v) => {
-                println!("Your score: {}", v);
-                if is_stay() {
-                    return score;
-                }
-            }
+            Score::Value(_) if is_stay() => return score,
+            _ => {}
         };
     }
 }
@@ -166,7 +176,7 @@ fn dealer_turn(deck: &mut Vec<Card>) -> Score {
     let mut dealer_cards: Vec<Card> = Vec::new();
     loop {
         draw(deck, &mut dealer_cards);
-        println!("Dealer cards: {:#?}", &mut dealer_cards);
+        println!("Dealer's cards: {}", cards_to_string(&dealer_cards));
         let score = calculate_score(&mut dealer_cards);
         match score {
             Score::Bust => {
@@ -178,7 +188,6 @@ fn dealer_turn(deck: &mut Vec<Card>) -> Score {
                 return score;
             }
             Score::Value(v) => {
-                println!("Dealer's score: {}", v);
                 if v == 17 && has_aces(&dealer_cards) || v > 17 {
                     println!("The dealer stays.");
                     return score;
@@ -198,7 +207,7 @@ fn determine_winner(player_score: Score, dealer_score: Score) {
         (_, Score::Bust) => println!("You win!"),
         (Score::Value(p), Score::Value(d)) if p > d => println!("You win!"),
         (Score::Value(p), Score::Value(d)) if p < d => println!("The dealer wins!"),
-        _ => unreachable!()
+        _ => unreachable!(),
     }
 }
 
