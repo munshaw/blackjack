@@ -36,7 +36,8 @@ enum Suit {
     Diamond,
 }
 
-#[derive(Debug)]
+// No copy/clone to avoid card duplication.
+#[derive(Debug, Eq, PartialEq)]
 struct Card {
     suit: Suit,
     rank: Rank,
@@ -138,7 +139,7 @@ fn draw(deck: &mut Vec<Card>, cards: &mut Vec<Card>) {
     }
 }
 
-fn is_stay() -> bool {
+fn player_will_stay() -> bool {
     loop {
         println!("Would you like to (h)it or (s)tay?");
         let mut input = String::new();
@@ -166,7 +167,7 @@ fn player_turn(deck: &mut Vec<Card>) -> Score {
                 println!("You blackjack!");
                 return score;
             }
-            Score::Value(_) if is_stay() => return score,
+            Score::Value(_) if player_will_stay() => return score,
             _ => {}
         };
     }
