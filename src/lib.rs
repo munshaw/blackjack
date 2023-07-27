@@ -6,3 +6,6 @@ pub mod cui;
 
 /// Functionality related to playing cards.
 pub mod card;
+
+/// Functionality related to hands of playing cards.
+pub mod hand;

@@ -1,5 +1,6 @@
-use blackjack::card::{Card, CardIter, Deck, Draw, DrawFrom, Hand, Rank, Score, Value};
+use blackjack::card::{Deck, Draw, Rank};
 use blackjack::cui::Cui;
+use blackjack::hand::{CardIter, DrawFrom, Hand, Score, Value};
 use blackjack::interface::{Action, Event, Interface};
 
 fn player_turn<UIT: Interface, DeckT: Draw>(ui: &UIT, deck: &mut DeckT) -> Value {
