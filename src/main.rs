@@ -1,62 +1,15 @@
+use blackjack::card::{Card, Rank, Suit};
 use blackjack::cui::Cui;
 use blackjack::interface::{Action, Event, Interface};
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::cmp::Ordering;
-use std::fmt::{Display, Formatter};
-
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
-enum Rank {
-    Ace,
-    Two,
-    Three,
-    Four,
-    Five,
-    Six,
-    Seven,
-    Eight,
-    Nine,
-    Ten,
-    Jack,
-    Queen,
-    King,
-}
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 enum Score {
     Bust,
     Blackjack,
     Value(u8),
-}
-
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
-enum Suit {
-    Spade,
-    Heart,
-    Club,
-    Diamond,
-}
-
-// No copy/clone to avoid card duplication.
-#[derive(Debug, Eq, PartialEq)]
-struct Card {
-    suit: Suit,
-    rank: Rank,
-}
-
-impl Card {
-    fn new(suit: &Suit, rank: &Rank) -> Card {
-        Card {
-            suit: *suit,
-            rank: *rank,
-        }
-    }
-}
-
-impl Display for Card {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?} of {:?}s", self.rank, self.suit)
-    }
 }
 
 fn cards_to_string(cards: &Vec<Card>) -> String {
