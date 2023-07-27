@@ -22,10 +22,10 @@ enum Rank {
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
-enum Score {
+enum Value {
     Bust,
     Blackjack,
-    Value(u8),
+    Points(u8),
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -94,7 +94,7 @@ fn has_aces(cards: &Vec<Card>) -> bool {
     cards.iter().any(|c| c.rank == Rank::Ace)
 }
 
-fn calculate_score(cards: &Vec<Card>) -> Score {
+fn calculate_score(cards: &Vec<Card>) -> Value {
     let mut value = 0;
     let mut aces = 0;
 
@@ -126,9 +126,9 @@ fn calculate_score(cards: &Vec<Card>) -> Score {
     }
 
     match value.cmp(&{ 21 }) {
-        Ordering::Less => Score::Value(value),
-        Ordering::Greater => Score::Bust,
-        Ordering::Equal => Score::Blackjack,
+        Ordering::Less => Value::Points(value),
+        Ordering::Greater => Value::Bust,
+        Ordering::Equal => Value::Blackjack,
     }
 }
 
@@ -152,43 +152,43 @@ fn player_will_stay() -> bool {
     }
 }
 
-fn player_turn(deck: &mut Vec<Card>) -> Score {
+fn player_turn(deck: &mut Vec<Card>) -> Value {
     let mut player_cards: Vec<Card> = Vec::new();
     loop {
         draw(deck, &mut player_cards);
         println!("Your cards: {}", cards_to_string(&player_cards));
         let score = calculate_score(&mut player_cards);
         match score {
-            Score::Bust => {
+            Value::Bust => {
                 println!("You bust!");
                 return score;
             }
-            Score::Blackjack => {
+            Value::Blackjack => {
                 println!("You blackjack!");
                 return score;
             }
-            Score::Value(_) if player_will_stay() => return score,
+            Value::Points(_) if player_will_stay() => return score,
             _ => {}
         };
     }
 }
 
-fn dealer_turn(deck: &mut Vec<Card>) -> Score {
+fn dealer_turn(deck: &mut Vec<Card>) -> Value {
     let mut dealer_cards: Vec<Card> = Vec::new();
     loop {
         draw(deck, &mut dealer_cards);
         println!("Dealer's cards: {}", cards_to_string(&dealer_cards));
         let score = calculate_score(&mut dealer_cards);
         match score {
-            Score::Bust => {
+            Value::Bust => {
                 println!("The dealer busts!");
                 return score;
             }
-            Score::Blackjack => {
+            Value::Blackjack => {
                 println!("The dealer blackjacks!");
                 return score;
             }
-            Score::Value(v) => {
+            Value::Points(v) => {
                 if v == 17 && has_aces(&dealer_cards) || v > 17 {
                     println!("The dealer stays.");
                     return score;
@@ -199,15 +199,15 @@ fn dealer_turn(deck: &mut Vec<Card>) -> Score {
     }
 }
 
-fn determine_winner(player_score: Score, dealer_score: Score) {
+fn determine_winner(player_score: Value, dealer_score: Value) {
     match (player_score, dealer_score) {
         (p, d) if p == d => println!("The game ended in a draw."),
-        (Score::Blackjack, _) => println!("You win!"),
-        (_, Score::Blackjack) => println!("The dealer wins!"),
-        (Score::Bust, _) => println!("You lose!"),
-        (_, Score::Bust) => println!("You win!"),
-        (Score::Value(p), Score::Value(d)) if p > d => println!("You win!"),
-        (Score::Value(p), Score::Value(d)) if p < d => println!("The dealer wins!"),
+        (Value::Blackjack, _) => println!("You win!"),
+        (_, Value::Blackjack) => println!("The dealer wins!"),
+        (Value::Bust, _) => println!("You lose!"),
+        (_, Value::Bust) => println!("You win!"),
+        (Value::Points(p), Value::Points(d)) if p > d => println!("You win!"),
+        (Value::Points(p), Value::Points(d)) if p < d => println!("The dealer wins!"),
         _ => unreachable!(),
     }
 }
