@@ -9,3 +9,6 @@ pub mod card;
 
 /// Functionality related to hands of playing cards.
 pub mod hand;
+
+/// Functionality related to decks of playing cards.
+pub mod deck;

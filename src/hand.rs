@@ -1,4 +1,5 @@
-use crate::card::{Card, Draw, Rank};
+use crate::card::{Card, Rank};
+use crate::deck::Draw;
 use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
 use std::slice::Iter;

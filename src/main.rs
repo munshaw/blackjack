@@ -1,5 +1,6 @@
-use blackjack::card::{Deck, Draw, Rank};
+use blackjack::card::Rank;
 use blackjack::cui::Cui;
+use blackjack::deck::{Deck, Draw};
 use blackjack::hand::{CardIter, DrawFrom, Hand, Score, Value};
 use blackjack::interface::{Action, Event, Interface};
 
