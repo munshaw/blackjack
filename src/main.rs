@@ -19,7 +19,7 @@ fn player_turn<UIT: Interface, DeckT: Draw>(ui: &UIT, deck: &mut DeckT) -> Value
                 ui.send_event(Event::PlayerBlackjack);
                 return score;
             }
-            Value::Points(_) if Action::PlayerStay == ui.get_player_action() => return score,
+            _ if Action::PlayerStay == ui.get_player_action() => return score,
             _ => {}
         };
     }
