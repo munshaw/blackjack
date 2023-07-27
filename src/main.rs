@@ -167,7 +167,7 @@ fn player_turn(deck: &mut Vec<Card>) -> Value {
                 println!("You blackjack!");
                 return score;
             }
-            Value::Points(_) if player_will_stay() => return score,
+            _ if player_will_stay() => return score,
             _ => {}
         };
     }
