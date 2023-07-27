@@ -1,8 +1,9 @@
+use blackjack::cui::Cui;
+use blackjack::interface::{Action, Event, Interface};
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
-use std::io::stdin;
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 enum Rank {
@@ -139,20 +140,7 @@ fn draw(deck: &mut Vec<Card>, cards: &mut Vec<Card>) {
     }
 }
 
-fn player_will_stay() -> bool {
-    loop {
-        println!("Would you like to (h)it or (s)tay?");
-        let mut input = String::new();
-        stdin().read_line(&mut input).unwrap();
-        if input.trim().to_lowercase() == "h" {
-            return false;
-        } else if input.trim().to_lowercase() == "s" {
-            return true;
-        }
-    }
-}
-
-fn player_turn(deck: &mut Vec<Card>) -> Score {
+fn player_turn<UIT: Interface>(ui: &UIT, deck: &mut Vec<Card>) -> Score {
     let mut player_cards: Vec<Card> = Vec::new();
     loop {
         draw(deck, &mut player_cards);
@@ -160,20 +148,20 @@ fn player_turn(deck: &mut Vec<Card>) -> Score {
         let score = calculate_score(&mut player_cards);
         match score {
             Score::Bust => {
-                println!("You bust!");
+                ui.send_event(Event::PlayerBust);
                 return score;
             }
             Score::Blackjack => {
-                println!("You blackjack!");
+                ui.send_event(Event::PlayerBlackjack);
                 return score;
             }
-            Score::Value(_) if player_will_stay() => return score,
+            Score::Value(_) if Action::PlayerStay == ui.get_player_action() => return score,
             _ => {}
         };
     }
 }
 
-fn dealer_turn(deck: &mut Vec<Card>) -> Score {
+fn dealer_turn<UIT: Interface>(ui: &UIT, deck: &mut Vec<Card>) -> Score {
     let mut dealer_cards: Vec<Card> = Vec::new();
     loop {
         draw(deck, &mut dealer_cards);
@@ -181,40 +169,41 @@ fn dealer_turn(deck: &mut Vec<Card>) -> Score {
         let score = calculate_score(&mut dealer_cards);
         match score {
             Score::Bust => {
-                println!("The dealer busts!");
+                ui.send_event(Event::DealerBust);
                 return score;
             }
             Score::Blackjack => {
-                println!("The dealer blackjacks!");
+                ui.send_event(Event::DealerBlackjack);
                 return score;
             }
             Score::Value(v) => {
                 if v == 17 && has_aces(&dealer_cards) || v > 17 {
-                    println!("The dealer stays.");
+                    ui.send_event(Event::DealerStay);
                     return score;
                 }
-                println!("The dealer hits.");
+                ui.send_event(Event::DealerHit);
             }
         };
     }
 }
 
-fn determine_winner(player_score: Score, dealer_score: Score) {
+fn determine_winner<UIT: Interface>(ui: &UIT, player_score: Score, dealer_score: Score) {
     match (player_score, dealer_score) {
-        (p, d) if p == d => println!("The game ended in a draw."),
-        (Score::Blackjack, _) => println!("You win!"),
-        (_, Score::Blackjack) => println!("The dealer wins!"),
-        (Score::Bust, _) => println!("You lose!"),
-        (_, Score::Bust) => println!("You win!"),
-        (Score::Value(p), Score::Value(d)) if p > d => println!("You win!"),
-        (Score::Value(p), Score::Value(d)) if p < d => println!("The dealer wins!"),
+        (p, d) if p == d => ui.send_event(Event::Tie),
+        (Score::Blackjack, _) => ui.send_event(Event::PlayerWin),
+        (_, Score::Blackjack) => ui.send_event(Event::PlayerLoose),
+        (Score::Bust, _) => ui.send_event(Event::PlayerLoose),
+        (_, Score::Bust) => ui.send_event(Event::PlayerWin),
+        (Score::Value(p), Score::Value(d)) if p > d => ui.send_event(Event::PlayerWin),
+        (Score::Value(p), Score::Value(d)) if p < d => ui.send_event(Event::PlayerLoose),
         _ => unreachable!(),
     }
 }
 
 fn main() {
+    let ui = Cui::new();
     let mut deck = new_deck();
-    let player_score = player_turn(&mut deck);
-    let dealer_score = dealer_turn(&mut deck);
-    determine_winner(player_score, dealer_score);
+    let player_score = player_turn(&ui, &mut deck);
+    let dealer_score = dealer_turn(&ui, &mut deck);
+    determine_winner(&ui, player_score, dealer_score);
 }
