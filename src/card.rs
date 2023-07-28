@@ -1,3 +1,4 @@
+use crate::card_like::CardLike;
 use std::fmt::{Display, Formatter};
 
 /// Playing card ranks.
@@ -30,8 +31,8 @@ pub enum Suit {
 /// Represents a French playing card.
 #[derive(Debug, Eq, PartialEq)] // Don't implement Copy to prevent card duplication.
 pub struct Card {
-    pub suit: Suit,
-    pub rank: Rank,
+    suit: Suit,
+    rank: Rank,
 }
 
 impl Card {
@@ -41,6 +42,16 @@ impl Card {
             suit: *suit,
             rank: *rank,
         }
+    }
+}
+
+impl CardLike for Card {
+    fn get_rank(&self) -> Rank {
+        self.rank
+    }
+
+    fn get_suit(&self) -> Suit {
+        self.suit
     }
 }
 

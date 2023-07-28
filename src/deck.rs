@@ -35,7 +35,7 @@ impl Deck {
     }
 }
 
-impl DrawFrom for Deck {
+impl DrawFrom<Card> for Deck {
     fn draw(&mut self) -> Option<Card> {
         self.0.pop()
     }

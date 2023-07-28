@@ -1,5 +1,6 @@
-use crate::card::{Card, Rank};
+use crate::card::Rank;
 use crate::card_iter::CardIter;
+use crate::card_like::CardLike;
 use crate::draw::{CannotDrawFromEmpty, DrawFrom, DrawTo};
 use crate::score::{Score, Value};
 use std::cmp::Ordering;
@@ -8,23 +9,27 @@ use std::slice::Iter;
 
 /// Represents a hand of playing cards.
 #[derive(Debug)]
-pub struct Hand(Vec<Card>);
+pub struct Hand<CardT: CardLike + Display>(Vec<CardT>);
 
-impl Hand {
+impl<CardT: CardLike + Display> Hand<CardT> {
     /// Build an empty hand.
-    pub fn new() -> Hand {
+    pub fn new() -> Hand<CardT> {
         Hand(Vec::new())
     }
 }
 
-impl CardIter for Hand {
-    fn iter(&self) -> Iter<'_, Card> {
+impl<CardT: CardLike + Display> CardIter for Hand<CardT> {
+    type CardT = CardT;
+
+    fn iter(&self) -> Iter<'_, Self::CardT> {
         self.0.iter()
     }
 }
 
-impl DrawTo for Hand {
-    fn draw_from<DrawT: DrawFrom>(&mut self, cards: &mut DrawT) -> Result<(), CannotDrawFromEmpty> {
+impl<CardT: CardLike + Display, DrawFromT: DrawFrom<CardT>> DrawTo<DrawFromT> for Hand<CardT> {
+    type Card = CardT;
+
+    fn draw_from(&mut self, cards: &mut DrawFromT) -> Result<(), CannotDrawFromEmpty> {
         match cards.draw() {
             None => Err(CannotDrawFromEmpty),
             Some(card) => {
@@ -35,13 +40,13 @@ impl DrawTo for Hand {
     }
 }
 
-impl Score for Hand {
+impl<CardT: CardLike + Display> Score for Hand<CardT> {
     fn score(&self) -> Value {
         let mut points = 0;
         let mut aces = 0;
 
         for card in &self.0[0..] {
-            points += match card.rank {
+            points += match card.get_rank() {
                 Rank::Ace => {
                     aces += 1;
                     11
@@ -75,7 +80,7 @@ impl Score for Hand {
     }
 }
 
-impl Display for Hand {
+impl<CardT: CardLike + Display> Display for Hand<CardT> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let result = self.0.iter().fold(
             String::new(),

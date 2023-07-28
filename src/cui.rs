@@ -1,4 +1,6 @@
+use crate::card_like::CardLike;
 use crate::interface::{Action, Event, Interface};
+use std::fmt::Display;
 use std::io::stdin;
 
 /// Simple CUI interface for a blackjack game.
@@ -12,7 +14,7 @@ impl Cui {
     }
 }
 
-impl Interface for Cui {
+impl<CardT: CardLike + Display> Interface<CardT> for Cui {
     fn get_action(&self) -> Action {
         loop {
             println!("Would you like to (h)it or (s)tay?");
@@ -26,7 +28,7 @@ impl Interface for Cui {
         }
     }
 
-    fn send(&self, event: Event) {
+    fn send(&self, event: Event<CardT>) {
         match event {
             Event::PlayerWin => println!("You win!"),
             Event::PlayerLoose => println!("The dealer wins!"),

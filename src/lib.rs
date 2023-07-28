@@ -10,6 +10,12 @@ pub mod score;
 /// Trait for iterating through a collection of cards.
 pub mod card_iter;
 
+/// Trait for playing card like entities
+pub mod card_like;
+
+/// Implementation of single deck blackjack.
+pub mod blackjack;
+
 /// CUI implementation of the blackjack user interface.
 pub mod cui;
 
