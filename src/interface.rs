@@ -1,13 +1,15 @@
+use crate::hand::Hand;
+
 /// Actions that the user may take on their turn.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum Action {
     PlayerStay,
-    PlayerHit
+    PlayerHit,
 }
 
 /// Game events displayable to the user.
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
-pub enum Event {
+#[derive(Debug)]
+pub enum Event<'a> {
     PlayerBust,
     PlayerBlackjack,
     DealerBust,
@@ -16,14 +18,16 @@ pub enum Event {
     DealerHit,
     PlayerWin,
     PlayerLoose,
-    Tie
+    Tie,
+    PlayerHand(&'a Hand),
+    DealerHand(&'a Hand),
 }
 
 /// A trait for user interfaces. Implement this to create a new GUI, CUI, etc.
 pub trait Interface {
-    /// Get the players turn action.
-    fn get_player_action(&self) -> Action;
+    /// Get the player's turn action.
+    fn get_action(&self) -> Action;
 
     /// Display an event to the player.
-    fn send_event(&self, event: Event);
+    fn send(&self, event: Event);
 }

@@ -8,18 +8,18 @@ fn player_turn<UIT: Interface, DeckT: Draw>(ui: &UIT, deck: &mut DeckT) -> Value
     let mut hand = Hand::new();
     loop {
         hand.draw_from(deck).unwrap();
-        println!("Your cards: {}", &hand);
+        ui.send(Event::PlayerHand(&hand));
         let score = hand.score();
         match score {
             Value::Bust => {
-                ui.send_event(Event::PlayerBust);
+                ui.send(Event::PlayerBust);
                 return score;
             }
             Value::Blackjack => {
-                ui.send_event(Event::PlayerBlackjack);
+                ui.send(Event::PlayerBlackjack);
                 return score;
             }
-            _ if Action::PlayerStay == ui.get_player_action() => return score,
+            _ if Action::PlayerStay == ui.get_action() => return score,
             _ => {}
         };
     }
@@ -33,23 +33,23 @@ fn dealer_turn<UIT: Interface, DeckT: Draw>(ui: &UIT, deck: &mut DeckT) -> Value
     let mut hand = Hand::new();
     loop {
         hand.draw_from(deck).unwrap();
-        println!("Dealer's cards: {}", &hand);
+        ui.send(Event::DealerHand(&hand));
         let score = hand.score();
         match score {
             Value::Bust => {
-                ui.send_event(Event::DealerBust);
+                ui.send(Event::DealerBust);
                 return score;
             }
             Value::Blackjack => {
-                ui.send_event(Event::DealerBlackjack);
+                ui.send(Event::DealerBlackjack);
                 return score;
             }
             Value::Points(v) => {
                 if v == 17 && has_aces(&hand) || v > 17 {
-                    ui.send_event(Event::DealerStay);
+                    ui.send(Event::DealerStay);
                     return score;
                 }
-                ui.send_event(Event::DealerHit);
+                ui.send(Event::DealerHit);
             }
         };
     }
@@ -57,13 +57,13 @@ fn dealer_turn<UIT: Interface, DeckT: Draw>(ui: &UIT, deck: &mut DeckT) -> Value
 
 fn determine_winner<UIT: Interface>(ui: &UIT, player_score: Value, dealer_score: Value) {
     match (player_score, dealer_score) {
-        (p, d) if p == d => ui.send_event(Event::Tie),
-        (Value::Blackjack, _) => ui.send_event(Event::PlayerWin),
-        (_, Value::Blackjack) => ui.send_event(Event::PlayerLoose),
-        (Value::Bust, _) => ui.send_event(Event::PlayerLoose),
-        (_, Value::Bust) => ui.send_event(Event::PlayerWin),
-        (Value::Points(p), Value::Points(d)) if p > d => ui.send_event(Event::PlayerWin),
-        (Value::Points(p), Value::Points(d)) if p < d => ui.send_event(Event::PlayerLoose),
+        (p, d) if p == d => ui.send(Event::Tie),
+        (Value::Blackjack, _) => ui.send(Event::PlayerWin),
+        (_, Value::Blackjack) => ui.send(Event::PlayerLoose),
+        (Value::Bust, _) => ui.send(Event::PlayerLoose),
+        (_, Value::Bust) => ui.send(Event::PlayerWin),
+        (Value::Points(p), Value::Points(d)) if p > d => ui.send(Event::PlayerWin),
+        (Value::Points(p), Value::Points(d)) if p < d => ui.send(Event::PlayerLoose),
         _ => unreachable!(),
     }
 }
