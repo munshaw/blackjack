@@ -1,16 +1,11 @@
 use crate::card::{Card, Rank, Suit};
+use crate::draw::DrawFrom;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 
 /// Represents a deck of playing cards.
 #[derive(Debug)]
 pub struct Deck(Vec<Card>);
-
-/// The ability to draw cards from this collection of cards.
-pub trait Draw {
-    /// Draw a card from this collection.
-    fn draw(&mut self) -> Option<Card>;
-}
 
 impl Deck {
     /// Build a freshly shuffled deck.
@@ -40,7 +35,7 @@ impl Deck {
     }
 }
 
-impl Draw for Deck {
+impl DrawFrom for Deck {
     fn draw(&mut self) -> Option<Card> {
         self.0.pop()
     }

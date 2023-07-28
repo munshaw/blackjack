@@ -1,5 +1,7 @@
 use crate::card::{Card, Rank};
-use crate::deck::Draw;
+use crate::card_iter::CardIter;
+use crate::draw::{CannotDrawFromEmpty, DrawFrom, DrawTo};
+use crate::score::{Score, Value};
 use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
 use std::slice::Iter;
@@ -15,30 +17,14 @@ impl Hand {
     }
 }
 
-/// The ability to iterate through cards.
-pub trait CardIter {
-    /// Returns an iterator over the slice.
-    fn iter(&self) -> Iter<'_, Card>;
-}
-
 impl CardIter for Hand {
     fn iter(&self) -> Iter<'_, Card> {
         self.0.iter()
     }
 }
 
-/// Error used when attempting to draw a card from an empty card collection.
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
-pub struct CannotDrawFromEmpty;
-
-/// The ability to draw from a drawable collection of cards.
-pub trait DrawFrom {
-    /// Draw a card from a drawable collection of cards into this.
-    fn draw_from<DrawT: Draw>(&mut self, cards: &mut DrawT) -> Result<(), CannotDrawFromEmpty>;
-}
-
-impl DrawFrom for Hand {
-    fn draw_from<DrawT: Draw>(&mut self, cards: &mut DrawT) -> Result<(), CannotDrawFromEmpty> {
+impl DrawTo for Hand {
+    fn draw_from<DrawT: DrawFrom>(&mut self, cards: &mut DrawT) -> Result<(), CannotDrawFromEmpty> {
         match cards.draw() {
             None => Err(CannotDrawFromEmpty),
             Some(card) => {
@@ -47,19 +33,6 @@ impl DrawFrom for Hand {
             }
         }
     }
-}
-
-/// The score of a blackjack hand.
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
-pub enum Value {
-    Bust,
-    Blackjack,
-    Points(u8),
-}
-
-/// The ability to evaluate the blackjack value of cards.
-pub trait Score {
-    fn score(&self) -> Value;
 }
 
 impl Score for Hand {

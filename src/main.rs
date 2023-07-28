@@ -1,10 +1,13 @@
 use blackjack::card::Rank;
+use blackjack::card_iter::CardIter;
 use blackjack::cui::Cui;
-use blackjack::deck::{Deck, Draw};
-use blackjack::hand::{CardIter, DrawFrom, Hand, Score, Value};
+use blackjack::deck::Deck;
+use blackjack::draw::{DrawFrom, DrawTo};
+use blackjack::hand::Hand;
 use blackjack::interface::{Action, Event, Interface};
+use blackjack::score::{Score, Value};
 
-fn player_turn<UIT: Interface, DeckT: Draw>(ui: &UIT, deck: &mut DeckT) -> Value {
+fn player_turn<UIT: Interface, DeckT: DrawFrom>(ui: &UIT, deck: &mut DeckT) -> Value {
     let mut hand = Hand::new();
     loop {
         hand.draw_from(deck).unwrap();
@@ -29,7 +32,7 @@ fn has_aces(cards: &Hand) -> bool {
     cards.iter().any(|c| c.rank == Rank::Ace)
 }
 
-fn dealer_turn<UIT: Interface, DeckT: Draw>(ui: &UIT, deck: &mut DeckT) -> Value {
+fn dealer_turn<UIT: Interface, DeckT: DrawFrom>(ui: &UIT, deck: &mut DeckT) -> Value {
     let mut hand = Hand::new();
     loop {
         hand.draw_from(deck).unwrap();
