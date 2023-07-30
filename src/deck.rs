@@ -3,6 +3,24 @@ use crate::draw::DrawFrom;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 
+const RANKS: [Rank; 13] = [
+    Rank::Ace,
+    Rank::Two,
+    Rank::Three,
+    Rank::Four,
+    Rank::Five,
+    Rank::Six,
+    Rank::Seven,
+    Rank::Eight,
+    Rank::Nine,
+    Rank::Ten,
+    Rank::Jack,
+    Rank::Queen,
+    Rank::King,
+];
+
+const SUITS: [Suit; 4] = [Suit::Spade, Suit::Heart, Suit::Club, Suit::Heart];
+
 /// Represents a deck of playing cards.
 #[derive(Debug)]
 pub struct Deck(Vec<Card>);
@@ -10,26 +28,10 @@ pub struct Deck(Vec<Card>);
 impl Deck {
     /// Build a freshly shuffled deck.
     pub fn new() -> Deck {
-        let suits = [Suit::Spade, Suit::Heart, Suit::Club, Suit::Diamond];
-        let ranks = [
-            Rank::Ace,
-            Rank::Two,
-            Rank::Three,
-            Rank::Four,
-            Rank::Five,
-            Rank::Six,
-            Rank::Seven,
-            Rank::Eight,
-            Rank::Nine,
-            Rank::Ten,
-            Rank::Jack,
-            Rank::Queen,
-            Rank::King,
-        ];
         let mut deck: Vec<Card> = Vec::new();
-        suits
+        SUITS
             .iter()
-            .for_each(|s| ranks.iter().for_each(|r| deck.push(Card::new(*s, *r))));
+            .for_each(|s| RANKS.iter().for_each(|r| deck.push(Card::new(*s, *r))));
         deck.shuffle(&mut thread_rng());
         Deck(deck)
     }

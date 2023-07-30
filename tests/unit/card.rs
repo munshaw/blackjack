@@ -1,25 +1,27 @@
 use blackjack::card::{Card, Rank, Suit};
 use blackjack::card_like::CardLike;
 
+const RANKS: [Rank; 13] = [
+    Rank::Ace,
+    Rank::Two,
+    Rank::Three,
+    Rank::Four,
+    Rank::Five,
+    Rank::Six,
+    Rank::Seven,
+    Rank::Eight,
+    Rank::Nine,
+    Rank::Ten,
+    Rank::Jack,
+    Rank::Queen,
+    Rank::King,
+];
+
+const SUITS: [Suit; 4] = [Suit::Spade, Suit::Diamond, Suit::Club, Suit::Heart];
+
 #[test]
 fn get_rank() {
-    [
-        Rank::Ace,
-        Rank::Two,
-        Rank::Three,
-        Rank::Four,
-        Rank::Five,
-        Rank::Six,
-        Rank::Seven,
-        Rank::Eight,
-        Rank::Nine,
-        Rank::Ten,
-        Rank::Jack,
-        Rank::Queen,
-        Rank::King,
-    ]
-    .iter()
-    .for_each(|r| get_rank_case(*r))
+    RANKS.iter().for_each(|r| get_rank_case(*r))
 }
 
 fn get_rank_case(rank: Rank) {
@@ -30,13 +32,25 @@ fn get_rank_case(rank: Rank) {
 
 #[test]
 fn get_suit() {
-    [Suit::Spade, Suit::Heart, Suit::Club, Suit::Heart]
-        .iter()
-        .for_each(|s| get_suit_case(*s))
+    SUITS.iter().for_each(|s| get_suit_case(*s))
 }
 
 fn get_suit_case(suit: Suit) {
     let card = Card::new(suit, Rank::Ten);
     let actual_suit = card.get_suit();
     assert_eq!(suit, actual_suit)
+}
+
+#[test]
+fn to_string() {
+    RANKS
+        .iter()
+        .for_each(|r| SUITS.iter().for_each(|s| to_string_case(*s, *r)))
+}
+
+fn to_string_case(suit: Suit, rank: Rank) {
+    let expected_string = format!("{:?} of {:?}s", rank, suit);
+    let card = Card::new(suit, rank);
+    let actual_string = card.to_string();
+    assert_eq!(expected_string, actual_string)
 }
