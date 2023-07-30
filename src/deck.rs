@@ -19,7 +19,7 @@ const RANKS: [Rank; 13] = [
     Rank::King,
 ];
 
-const SUITS: [Suit; 4] = [Suit::Spade, Suit::Heart, Suit::Club, Suit::Heart];
+const SUITS: [Suit; 4] = [Suit::Spade, Suit::Heart, Suit::Club, Suit::Diamond];
 
 /// Represents a deck of playing cards.
 #[derive(Debug)]
