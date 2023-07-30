@@ -26,7 +26,7 @@ where
     U: Interface<C>,
     D: DrawFrom<C>,
 {
-    /// Create a new game of blackjack.
+    /// Create a new game of single player blackjack.
     pub fn new(ui: &'a U, deck: &'a mut D) -> Blackjack<'a, C, U, D> {
         Blackjack {
             _c: Default::default(),
@@ -35,8 +35,15 @@ where
         }
     }
 
+    /// Start a game of single player blackjack.
+    pub fn start(&mut self) {
+        let player_score = self.player_turn();
+        let dealer_score = self.dealer_turn();
+        self.determine_winner(player_score, dealer_score);
+    }
+
     /// Make the player have their turn.
-    pub fn player_turn(&mut self) -> Value {
+    fn player_turn(&mut self) -> Value {
         let mut hand = Hand::new();
         loop {
             hand.draw_from(self.deck)
@@ -63,7 +70,7 @@ where
     }
 
     /// Make the dealer have their turn.
-    pub fn dealer_turn(&mut self) -> Value {
+    fn dealer_turn(&mut self) -> Value {
         let mut hand = Hand::new();
         loop {
             hand.draw_from(self.deck)
@@ -91,7 +98,7 @@ where
     }
 
     /// Determine the winner of the game.
-    pub fn determine_winner(&self, player_score: Value, dealer_score: Value) {
+    fn determine_winner(&self, player_score: Value, dealer_score: Value) {
         match (player_score, dealer_score) {
             (p, d) if p == d => self.ui.send(Event::Tie),
             (Value::Blackjack, _) => self.ui.send(Event::PlayerWin),
