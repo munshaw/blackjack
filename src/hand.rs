@@ -9,27 +9,34 @@ use std::slice::Iter;
 
 /// Represents a hand of playing cards.
 #[derive(Debug)]
-pub struct Hand<CardT: CardLike + Display>(Vec<CardT>);
+pub struct Hand<C>(Vec<C>);
 
-impl<CardT: CardLike + Display> Hand<CardT> {
+impl<C> Hand<C> {
     /// Build an empty hand.
-    pub fn new() -> Hand<CardT> {
+    pub fn new() -> Hand<C> {
         Hand(Vec::new())
     }
 }
 
-impl<CardT: CardLike + Display> CardIter for Hand<CardT> {
-    type CardT = CardT;
+impl<C> CardIter for Hand<C>
+where
+    C: CardLike + Display,
+{
+    type C = C;
 
-    fn iter(&self) -> Iter<'_, Self::CardT> {
+    fn iter(&self) -> Iter<'_, Self::C> {
         self.0.iter()
     }
 }
 
-impl<CardT: CardLike + Display, DrawFromT: DrawFrom<CardT>> DrawTo<DrawFromT> for Hand<CardT> {
-    type Card = CardT;
+impl<C, D> DrawTo<D> for Hand<C>
+where
+    C: CardLike + Display,
+    D: DrawFrom<C>,
+{
+    type Card = C;
 
-    fn draw_from(&mut self, cards: &mut DrawFromT) -> Result<(), CannotDrawFromEmpty> {
+    fn draw_from(&mut self, cards: &mut D) -> Result<(), CannotDrawFromEmpty> {
         match cards.draw() {
             None => Err(CannotDrawFromEmpty),
             Some(card) => {
@@ -40,7 +47,10 @@ impl<CardT: CardLike + Display, DrawFromT: DrawFrom<CardT>> DrawTo<DrawFromT> fo
     }
 }
 
-impl<CardT: CardLike + Display> Score for Hand<CardT> {
+impl<C> Score for Hand<C>
+where
+    C: CardLike + Display,
+{
     fn score(&self) -> Value {
         let mut points = 0;
         let mut aces = 0;
@@ -80,7 +90,10 @@ impl<CardT: CardLike + Display> Score for Hand<CardT> {
     }
 }
 
-impl<CardT: CardLike + Display> Display for Hand<CardT> {
+impl<C> Display for Hand<C>
+where
+    C: CardLike + Display,
+{
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let result = self.0.iter().fold(
             String::new(),

@@ -9,19 +9,27 @@ use std::fmt::Display;
 use std::marker::PhantomData;
 
 /// Represents a game of single deck blackjack.
-pub struct Blackjack<'a, CardT: CardLike + Display, UIT: Interface<CardT>, DeckT: DrawFrom<CardT>> {
-    _t: PhantomData<CardT>,
-    ui: &'a UIT,
-    deck: &'a mut DeckT,
+pub struct Blackjack<'a, C, U, D>
+where
+    C: CardLike + Display,
+    U: Interface<C>,
+    D: DrawFrom<C>,
+{
+    _c: PhantomData<C>,
+    ui: &'a U,
+    deck: &'a mut D,
 }
 
-impl<'a, CardT: CardLike + Display, UIT: Interface<CardT>, DeckT: DrawFrom<CardT>>
-    Blackjack<'a, CardT, UIT, DeckT>
+impl<'a, C, U, D> Blackjack<'a, C, U, D>
+where
+    C: CardLike + Display,
+    U: Interface<C>,
+    D: DrawFrom<C>,
 {
     /// Create a new game of blackjack.
-    pub fn new(ui: &'a UIT, deck: &'a mut DeckT) -> Blackjack<'a, CardT, UIT, DeckT> {
+    pub fn new(ui: &'a U, deck: &'a mut D) -> Blackjack<'a, C, U, D> {
         Blackjack {
-            _t: Default::default(),
+            _c: Default::default(),
             ui,
             deck,
         }
@@ -49,7 +57,7 @@ impl<'a, CardT: CardLike + Display, UIT: Interface<CardT>, DeckT: DrawFrom<CardT
         }
     }
 
-    fn has_aces(cards: &Hand<CardT>) -> bool {
+    fn has_aces(cards: &Hand<C>) -> bool {
         cards.iter().any(|c| c.get_rank() == Rank::Ace)
     }
 

@@ -6,15 +6,21 @@ use std::fmt::Display;
 pub struct CannotDrawFromEmpty;
 
 /// The ability to draw cards from this collection of cards.
-pub trait DrawFrom<CardT: CardLike + Display> {
+pub trait DrawFrom<C>
+where
+    C: CardLike + Display,
+{
     /// Draw a card from this collection.
-    fn draw(&mut self) -> Option<CardT>;
+    fn draw(&mut self) -> Option<C>;
 }
 
 /// The ability to draw from a drawable collection of cards.
-pub trait DrawTo<DrawFromT: DrawFrom<Self::Card>> {
+pub trait DrawTo<D>
+where
+    D: DrawFrom<Self::Card>,
+{
     type Card: CardLike + Display;
 
     /// Draw a card from a drawable collection of cards into this.
-    fn draw_from(&mut self, cards: &mut DrawFromT) -> Result<(), CannotDrawFromEmpty>;
+    fn draw_from(&mut self, cards: &mut D) -> Result<(), CannotDrawFromEmpty>;
 }

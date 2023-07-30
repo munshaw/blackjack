@@ -14,7 +14,10 @@ impl Cui {
     }
 }
 
-impl<CardT: CardLike + Display> Interface<CardT> for Cui {
+impl<C> Interface<C> for Cui
+where
+    C: CardLike + Display,
+{
     fn get_action(&self) -> Action {
         loop {
             println!("Would you like to (h)it or (s)tay?");
@@ -28,7 +31,7 @@ impl<CardT: CardLike + Display> Interface<CardT> for Cui {
         }
     }
 
-    fn send(&self, event: Event<CardT>) {
+    fn send(&self, event: Event<C>) {
         match event {
             Event::PlayerWin => println!("You win!"),
             Event::PlayerLoose => println!("The dealer wins!"),
