@@ -94,6 +94,10 @@ fn has_aces(cards: &Vec<Card>) -> bool {
     cards.iter().any(|c| c.rank == Rank::Ace)
 }
 
+fn is_dealer_hitting(points: u8, hand: &Vec<Card>) -> bool {
+    points == 17 && has_aces(&hand) || points > 17
+}
+
 fn calculate_score(cards: &Vec<Card>) -> Value {
     let mut value = 0;
     let mut aces = 0;
@@ -189,7 +193,7 @@ fn dealer_turn(deck: &mut Vec<Card>) -> Value {
                 return score;
             }
             Value::Points(v) => {
-                if v == 17 && has_aces(&dealer_cards) || v > 17 {
+                if is_dealer_hitting(v, &dealer_cards) {
                     println!("The dealer stays.");
                     return score;
                 }
