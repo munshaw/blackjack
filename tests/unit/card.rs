@@ -17,7 +17,7 @@ const RANKS: [Rank; 13] = [
     Rank::King,
 ];
 
-const SUITS: [Suit; 4] = [Suit::Spade, Suit::Diamond, Suit::Club, Suit::Heart];
+const SUITS: [Suit; 4] = [Suit::Spade, Suit::Heart, Suit::Club, Suit::Diamond];
 
 #[test]
 fn get_rank() {

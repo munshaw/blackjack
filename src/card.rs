@@ -2,7 +2,7 @@ use crate::card_like::CardLike;
 use std::fmt::{Display, Formatter};
 
 /// Playing card ranks.
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub enum Rank {
     Ace,
     Two,
@@ -20,7 +20,7 @@ pub enum Rank {
 }
 
 /// Playing card suits.
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub enum Suit {
     Spade,
     Heart,
@@ -28,8 +28,7 @@ pub enum Suit {
     Diamond,
 }
 
-/// Represents a French playing card.
-#[derive(Debug, Eq, PartialEq)] // Don't implement Copy to prevent card duplication.
+#[derive(Debug, Eq, PartialEq, Hash)] // Don't implement Copy to prevent card duplication.
 pub struct Card {
     suit: Suit,
     rank: Rank,
