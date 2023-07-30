@@ -22,20 +22,18 @@ impl<C> CardIter for Hand<C>
 where
     C: CardLike + Display,
 {
-    type C = C;
+    type Card = C;
 
-    fn iter(&self) -> Iter<'_, Self::C> {
+    fn iter(&self) -> Iter<'_, Self::Card> {
         self.0.iter()
     }
 }
 
-impl<C, D> DrawTo<D> for Hand<C>
+impl<C, D> DrawTo<C, D> for Hand<C>
 where
     C: CardLike + Display,
     D: DrawFrom<C>,
 {
-    type Card = C;
-
     fn draw_from(&mut self, cards: &mut D) -> Result<(), CannotDrawFromEmpty> {
         match cards.draw() {
             None => Err(CannotDrawFromEmpty),

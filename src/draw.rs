@@ -1,4 +1,6 @@
+use crate::card::Card;
 use crate::card_like::CardLike;
+use mockall::automock;
 use std::fmt::Display;
 
 /// Error used when attempting to draw a card from an empty card collection.
@@ -6,6 +8,7 @@ use std::fmt::Display;
 pub struct CannotDrawFromEmpty;
 
 /// The ability to draw cards from this collection of cards.
+#[automock]
 pub trait DrawFrom<C>
 where
     C: CardLike + Display,
@@ -15,12 +18,12 @@ where
 }
 
 /// The ability to draw from a drawable collection of cards.
-pub trait DrawTo<D>
+#[automock]
+pub trait DrawTo<C, D>
 where
-    D: DrawFrom<Self::Card>,
+    C: CardLike + Display,
+    D: DrawFrom<C>,
 {
-    type Card: CardLike + Display;
-
     /// Draw a card from a drawable collection of cards into this.
     fn draw_from(&mut self, cards: &mut D) -> Result<(), CannotDrawFromEmpty>;
 }
