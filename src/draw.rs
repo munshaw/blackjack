@@ -1,4 +1,3 @@
-use crate::card::Card;
 use crate::card_like::CardLike;
 use mockall::automock;
 use std::fmt::Display;

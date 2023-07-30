@@ -37,11 +37,8 @@ pub struct Card {
 
 impl Card {
     /// Build a new playing card, of rank and suit.
-    pub fn new(suit: &Suit, rank: &Rank) -> Card {
-        Card {
-            suit: *suit,
-            rank: *rank,
-        }
+    pub fn new(suit: Suit, rank: Rank) -> Card {
+        Card { suit, rank }
     }
 }
 

@@ -29,7 +29,7 @@ impl Deck {
         let mut deck: Vec<Card> = Vec::new();
         suits
             .iter()
-            .for_each(|s| ranks.iter().for_each(|r| deck.push(Card::new(s, r))));
+            .for_each(|s| ranks.iter().for_each(|r| deck.push(Card::new(*s, *r))));
         deck.shuffle(&mut thread_rng());
         Deck(deck)
     }
