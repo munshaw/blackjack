@@ -39,7 +39,8 @@ where
     pub fn player_turn(&mut self) -> Value {
         let mut hand = Hand::new();
         loop {
-            hand.draw_from(self.deck).unwrap();
+            hand.draw_from(self.deck)
+                .expect("Cannot draw from empty deck.");
             self.ui.send(Event::PlayerHand(&hand));
             let score = hand.score();
             match score {
@@ -65,7 +66,8 @@ where
     pub fn dealer_turn(&mut self) -> Value {
         let mut hand = Hand::new();
         loop {
-            hand.draw_from(self.deck).unwrap();
+            hand.draw_from(self.deck)
+                .expect("Cannot draw from empty deck.");
             self.ui.send(Event::DealerHand(&hand));
             let score = hand.score();
             match score {
