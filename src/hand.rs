@@ -20,7 +20,7 @@ impl<C> Hand<C> {
 
 impl<C> CardIter for Hand<C>
 where
-    C: CardLike + Display,
+    C: CardLike,
 {
     type Card = C;
 
@@ -31,7 +31,7 @@ where
 
 impl<C, D> DrawTo<C, D> for Hand<C>
 where
-    C: CardLike + Display,
+    C: CardLike,
     D: DrawFrom<C>,
 {
     fn draw_from(&mut self, cards: &mut D) -> Result<(), CannotDrawFromEmpty> {
@@ -47,7 +47,7 @@ where
 
 impl<C> Score for Hand<C>
 where
-    C: CardLike + Display,
+    C: CardLike,
 {
     fn score(&self) -> Value {
         let mut points = 0;

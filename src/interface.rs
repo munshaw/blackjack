@@ -1,7 +1,6 @@
 use crate::card_like::CardLike;
 use crate::hand::Hand;
 use mockall::automock;
-use std::fmt::Display;
 
 /// Actions that the user may take on their turn.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -14,7 +13,7 @@ pub enum Action {
 #[derive(Debug)]
 pub enum Event<'a, C>
 where
-    C: CardLike + Display,
+    C: CardLike,
 {
     PlayerBust,
     PlayerBlackjack,
@@ -33,7 +32,7 @@ where
 #[automock]
 pub trait Interface<C>
 where
-    C: CardLike + Display,
+    C: CardLike,
 {
     /// Get the player’s turn action.
     fn get_action(&self) -> Action;

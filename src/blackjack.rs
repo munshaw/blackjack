@@ -5,13 +5,12 @@ use crate::draw::{DrawFrom, DrawTo};
 use crate::hand::Hand;
 use crate::interface::{Action, Event, Interface};
 use crate::score::{Score, Value};
-use std::fmt::Display;
 use std::marker::PhantomData;
 
 /// Represents a game of single deck blackjack.
 pub struct Blackjack<'a, C, U, D>
 where
-    C: CardLike + Display,
+    C: CardLike,
     U: Interface<C>,
     D: DrawFrom<C>,
 {
@@ -22,7 +21,7 @@ where
 
 impl<'a, C, U, D> Blackjack<'a, C, U, D>
 where
-    C: CardLike + Display,
+    C: CardLike,
     U: Interface<C>,
     D: DrawFrom<C>,
 {
