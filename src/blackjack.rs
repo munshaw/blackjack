@@ -69,6 +69,10 @@ where
         cards.iter().any(|c| c.get_rank() == Rank::Ace)
     }
 
+    fn is_dealer_hitting(&self, points: u8, hand: &Hand<C>) -> bool {
+        points == 17 && Self::has_aces(&hand) || points > 17
+    }
+
     /// Make the dealer have their turn.
     fn dealer_turn(&mut self) -> Value {
         let mut hand = Hand::new();
@@ -87,7 +91,7 @@ where
                     return score;
                 }
                 Value::Points(v) => {
-                    if v == 17 && Self::has_aces(&hand) || v > 17 {
+                    if self.is_dealer_hitting(v, &hand) {
                         self.ui.send(Event::DealerStay);
                         return score;
                     }
