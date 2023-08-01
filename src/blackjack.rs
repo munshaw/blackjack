@@ -15,7 +15,7 @@ where
     D: DrawFrom<C>,
 {
     _c: PhantomData<C>,
-    ui: &'a U,
+    ui: &'a mut U,
     deck: &'a mut D,
 }
 
@@ -26,7 +26,7 @@ where
     D: DrawFrom<C>,
 {
     /// Create a new game of single player blackjack.
-    pub fn new(ui: &'a U, deck: &'a mut D) -> Blackjack<'a, C, U, D> {
+    pub fn new(ui: &'a mut U, deck: &'a mut D) -> Blackjack<'a, C, U, D> {
         Blackjack {
             _c: Default::default(),
             ui,
@@ -101,7 +101,7 @@ where
     }
 
     /// Determine the winner of the game.
-    fn determine_winner(&self, player_score: Value, dealer_score: Value) {
+    fn determine_winner(&mut self, player_score: Value, dealer_score: Value) {
         match (player_score, dealer_score) {
             (p, d) if p == d => self.ui.send(Event::Tie),
             (Value::Blackjack, _) => self.ui.send(Event::PlayerWin),

@@ -3,5 +3,5 @@ use blackjack::cui::Cui;
 use blackjack::deck::Deck;
 
 fn main() {
-    Blackjack::new(&Cui::new(), &mut Deck::new()).start();
+    Blackjack::new(&mut Cui::new(), &mut Deck::new()).start();
 }

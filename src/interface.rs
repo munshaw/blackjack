@@ -1,6 +1,5 @@
 use crate::card_like::CardLike;
 use crate::hand::Hand;
-use mockall::automock;
 
 /// Actions that the user may take on their turn.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
@@ -29,14 +28,13 @@ where
 }
 
 /// A trait for user interfaces. Implement this to create a new GUI, CUI, etc.
-#[automock]
 pub trait Interface<C>
 where
     C: CardLike,
 {
     /// Get the player’s turn action.
-    fn get_action(&self) -> Action;
+    fn get_action(&mut self) -> Action;
 
     /// Display an event to the player.
-    fn send<'a>(&self, event: Event<'a, C>);
+    fn send(&mut self, event: Event<C>);
 }
