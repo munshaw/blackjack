@@ -2,8 +2,82 @@ use blackjack::blackjack::Blackjack;
 use blackjack::card::{Rank, Suit};
 use blackjack::card_iter::CardIter;
 use blackjack::card_like::{CardLike, MockCardLike};
-use blackjack::draw::MockDrawFrom;
+use blackjack::draw::{CannotDrawFromEmpty, DrawFrom, DrawTo, MockDrawFrom};
 use blackjack::interface::{Action, Event, Interface};
+use blackjack::score::{Score, Value};
+use std::cmp::Ordering;
+use std::slice::Iter;
+
+struct FakeHand(Vec<MockCardLike>);
+
+impl FakeHand {
+    fn new() -> FakeHand {
+        FakeHand(Vec::new())
+    }
+}
+
+impl CardIter for FakeHand {
+    type Card = MockCardLike;
+
+    fn iter(&self) -> Iter<'_, Self::Card> {
+        self.0.iter()
+    }
+}
+
+impl DrawTo<MockCardLike, MockDrawFrom<MockCardLike>> for FakeHand {
+    fn draw_from(
+        &mut self,
+        cards: &mut MockDrawFrom<MockCardLike>,
+    ) -> Result<(), CannotDrawFromEmpty> {
+        match cards.draw() {
+            None => Err(CannotDrawFromEmpty),
+            Some(card) => {
+                self.0.push(card);
+                Ok(())
+            }
+        }
+    }
+}
+
+impl Score for FakeHand {
+    fn score(&self) -> Value {
+        let mut points = 0;
+        let mut aces = 0;
+
+        for card in &self.0[0..] {
+            points += match card.get_rank() {
+                Rank::Ace => {
+                    aces += 1;
+                    11
+                }
+                Rank::Two => 2,
+                Rank::Three => 3,
+                Rank::Four => 4,
+                Rank::Five => 5,
+                Rank::Six => 6,
+                Rank::Seven => 7,
+                Rank::Eight => 8,
+                Rank::Nine => 9,
+                Rank::Ten => 10,
+                Rank::Jack => 10,
+                Rank::Queen => 10,
+                Rank::King => 10,
+            };
+        }
+
+        // Try valuing aces at 1 to avoid busting.
+        while points > 21 && aces > 0 {
+            points -= 10;
+            aces -= 1;
+        }
+
+        match points.cmp(&{ 21 }) {
+            Ordering::Less => Value::Points(points),
+            Ordering::Greater => Value::Bust,
+            Ordering::Equal => Value::Blackjack,
+        }
+    }
+}
 
 struct MockInterface {
     player_actions: Vec<Action>,
@@ -88,12 +162,12 @@ impl MockInterface {
     }
 }
 
-impl Interface<MockCardLike> for MockInterface {
+impl Interface<FakeHand> for MockInterface {
     fn get_action(&mut self) -> Action {
         self.player_actions.pop().unwrap()
     }
 
-    fn send(&mut self, event: Event<MockCardLike>) {
+    fn send(&mut self, event: Event<FakeHand>) {
         match event {
             Event::PlayerBust => self.player_bust += 1,
             Event::PlayerBlackjack => self.player_blackjack += 1,
@@ -139,11 +213,16 @@ fn player_six_five_nine_stay_dealer_two_six_jack() {
     let card5 = (Rank::Six, Suit::Diamond);
     let card6 = (Rank::Jack, Suit::Diamond);
     let actions = vec![Action::PlayerHit, Action::PlayerHit, Action::PlayerStay];
-
     let mut ui = MockInterface::new();
     ui.set_player_actions(actions);
     let mut deck = mock_deck(vec![card1, card2, card3, card4, card5, card6]);
-    Blackjack::new(&mut ui, &mut deck).start();
+    Blackjack::new(
+        &mut ui,
+        &mut deck,
+        &mut FakeHand::new(),
+        &mut FakeHand::new(),
+    )
+    .start();
     ui.verify_player_hands(vec![
         vec![card1],
         vec![card1, card2],
@@ -173,11 +252,16 @@ fn player_king_seven_ten_bust_dealer_ace_jack() {
     let card4 = (Rank::Ace, Suit::Heart);
     let card5 = (Rank::Jack, Suit::Diamond);
     let actions = vec![Action::PlayerHit, Action::PlayerHit];
-
     let mut ui = MockInterface::new();
     ui.set_player_actions(actions);
     let mut deck = mock_deck(vec![card1, card2, card3, card4, card5]);
-    Blackjack::new(&mut ui, &mut deck).start();
+    Blackjack::new(
+        &mut ui,
+        &mut deck,
+        &mut FakeHand::new(),
+        &mut FakeHand::new(),
+    )
+    .start();
     ui.verify_player_hands(vec![
         vec![card1],
         vec![card1, card2],
@@ -204,11 +288,16 @@ fn player_king_seven_four_blackjack_dealer_six_eight_jack() {
     let card5 = (Rank::Eight, Suit::Heart);
     let card6 = (Rank::Jack, Suit::Diamond);
     let actions = vec![Action::PlayerHit, Action::PlayerHit];
-
     let mut ui = MockInterface::new();
     ui.set_player_actions(actions);
     let mut deck = mock_deck(vec![card1, card2, card3, card4, card5, card6]);
-    Blackjack::new(&mut ui, &mut deck).start();
+    Blackjack::new(
+        &mut ui,
+        &mut deck,
+        &mut FakeHand::new(),
+        &mut FakeHand::new(),
+    )
+    .start();
     ui.verify_player_hands(vec![
         vec![card1],
         vec![card1, card2],
@@ -237,11 +326,16 @@ fn player_ace_king_blackjack_dealer_ace_king() {
     let card3 = (Rank::Ace, Suit::Club);
     let card4 = (Rank::King, Suit::Spade);
     let actions = vec![Action::PlayerHit, Action::PlayerHit];
-
     let mut ui = MockInterface::new();
     ui.set_player_actions(actions);
     let mut deck = mock_deck(vec![card1, card2, card3, card4]);
-    Blackjack::new(&mut ui, &mut deck).start();
+    Blackjack::new(
+        &mut ui,
+        &mut deck,
+        &mut FakeHand::new(),
+        &mut FakeHand::new(),
+    )
+    .start();
     ui.verify_player_hands(vec![vec![card1], vec![card1, card2]]);
     ui.verify_dealer_hands(vec![vec![card3], vec![card3, card4]]);
     ui.verify_player_bust_times(0);
@@ -253,4 +347,48 @@ fn player_ace_king_blackjack_dealer_ace_king() {
     ui.verify_player_win_times(0);
     ui.verify_player_loose_times(0);
     ui.verify_tie_times(1);
+}
+
+#[test]
+fn player_ace_nine_king_four_dealer_ace_six_nine_four() {
+    let card1 = (Rank::Ace, Suit::Diamond);
+    let card2 = (Rank::Nine, Suit::Club);
+    let card3 = (Rank::King, Suit::Spade);
+    let card4 = (Rank::Four, Suit::Heart);
+    let card5 = (Rank::Ace, Suit::Heart);
+    let card6 = (Rank::Six, Suit::Diamond);
+    let card7 = (Rank::Nine, Suit::Diamond);
+    let card8 = (Rank::Four, Suit::Spade);
+    let actions = vec![Action::PlayerHit, Action::PlayerHit, Action::PlayerHit];
+    let mut ui = MockInterface::new();
+    ui.set_player_actions(actions);
+    let mut deck = mock_deck(vec![card1, card2, card3, card4, card5, card6, card7, card8]);
+    Blackjack::new(
+        &mut ui,
+        &mut deck,
+        &mut FakeHand::new(),
+        &mut FakeHand::new(),
+    )
+    .start();
+    ui.verify_player_hands(vec![
+        vec![card1],
+        vec![card1, card2],
+        vec![card1, card2, card3],
+        vec![card1, card2, card3, card4],
+    ]);
+    ui.verify_dealer_hands(vec![
+        vec![card5],
+        vec![card5, card6],
+        vec![card5, card6, card7],
+        vec![card5, card6, card7, card8],
+    ]);
+    ui.verify_player_bust_times(1);
+    ui.verify_player_blackjack_times(0);
+    ui.verify_dealer_bust_times(0);
+    ui.verify_dealer_blackjack_times(0);
+    ui.verify_dealer_stay_times(1);
+    ui.verify_dealer_hit_times(3);
+    ui.verify_player_win_times(0);
+    ui.verify_player_loose_times(1);
+    ui.verify_tie_times(0);
 }

@@ -1,4 +1,4 @@
-use crate::card_like::CardLike;
+use crate::card_iter::CardIter;
 use crate::interface::{Action, Event, Interface};
 use std::fmt::Display;
 use std::io::stdin;
@@ -14,9 +14,9 @@ impl Cui {
     }
 }
 
-impl<C> Interface<C> for Cui
+impl<H> Interface<H> for Cui
 where
-    C: CardLike + Display,
+    H: CardIter + Display,
 {
     fn get_action(self: &mut Cui) -> Action {
         loop {
@@ -31,7 +31,7 @@ where
         }
     }
 
-    fn send(self: &mut Cui, event: Event<C>) {
+    fn send(self: &mut Cui, event: Event<H>) {
         match event {
             Event::PlayerWin => println!("You win!"),
             Event::PlayerLoose => println!("The dealer wins!"),

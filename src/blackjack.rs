@@ -2,35 +2,45 @@ use crate::card::Rank;
 use crate::card_iter::CardIter;
 use crate::card_like::CardLike;
 use crate::draw::{DrawFrom, DrawTo};
-use crate::hand::Hand;
 use crate::interface::{Action, Event, Interface};
 use crate::score::{Score, Value};
 use std::marker::PhantomData;
 
 /// Represents a game of single deck blackjack.
-pub struct Blackjack<'a, C, U, D>
+pub struct Blackjack<'a, C, U, D, H>
 where
     C: CardLike,
-    U: Interface<C>,
+    U: Interface<H>,
     D: DrawFrom<C>,
+    H: CardIter + Score + DrawTo<C, D>,
 {
     _c: PhantomData<C>,
     ui: &'a mut U,
     deck: &'a mut D,
+    player_hand: &'a mut H,
+    dealer_hand: &'a mut H,
 }
 
-impl<'a, C, U, D> Blackjack<'a, C, U, D>
+impl<'a, C, U, D, H> Blackjack<'a, C, U, D, H>
 where
     C: CardLike,
-    U: Interface<C>,
+    U: Interface<H>,
     D: DrawFrom<C>,
+    H: CardIter + Score + DrawTo<C, D>,
 {
     /// Create a new game of single player blackjack.
-    pub fn new(ui: &'a mut U, deck: &'a mut D) -> Blackjack<'a, C, U, D> {
+    pub fn new(
+        ui: &'a mut U,
+        deck: &'a mut D,
+        player_hand: &'a mut H,
+        dealer_hand: &'a mut H,
+    ) -> Blackjack<'a, C, U, D, H> {
         Blackjack {
             _c: Default::default(),
             ui,
             deck,
+            player_hand,
+            dealer_hand,
         }
     }
 
@@ -43,12 +53,12 @@ where
 
     /// Make the player have their turn.
     fn player_turn(&mut self) -> Value {
-        let mut hand = Hand::new();
         loop {
-            hand.draw_from(self.deck)
+            self.player_hand
+                .draw_from(self.deck)
                 .expect("Cannot draw from empty deck.");
-            self.ui.send(Event::PlayerHand(&hand));
-            let score = hand.score();
+            self.ui.send(Event::PlayerHand(&self.player_hand));
+            let score = self.player_hand.score();
             match score {
                 Value::Bust => {
                     self.ui.send(Event::PlayerBust);
@@ -64,22 +74,22 @@ where
         }
     }
 
-    fn has_aces(cards: &Hand<C>) -> bool {
+    fn has_aces(cards: &H) -> bool {
         cards.iter().any(|c| c.get_rank() == Rank::Ace)
     }
 
-    fn is_dealer_hitting(&self, points: u8, hand: &Hand<C>) -> bool {
-        points == 17 && Self::has_aces(&hand) || points > 17
+    fn is_dealer_staying(&self, points: u8, hand: &H) -> bool {
+        points == 17 && !Self::has_aces(&hand) || points > 17
     }
 
     /// Make the dealer have their turn.
     fn dealer_turn(&mut self) -> Value {
-        let mut hand = Hand::new();
         loop {
-            hand.draw_from(self.deck)
+            self.dealer_hand
+                .draw_from(self.deck)
                 .expect("Cannot draw from empty deck.");
-            self.ui.send(Event::DealerHand(&hand));
-            let score = hand.score();
+            self.ui.send(Event::DealerHand(&self.dealer_hand));
+            let score = self.dealer_hand.score();
             match score {
                 Value::Bust => {
                     self.ui.send(Event::DealerBust);
@@ -90,7 +100,7 @@ where
                     return score;
                 }
                 Value::Points(v) => {
-                    if self.is_dealer_hitting(v, &hand) {
+                    if self.is_dealer_staying(v, &self.dealer_hand) {
                         self.ui.send(Event::DealerStay);
                         return score;
                     }
