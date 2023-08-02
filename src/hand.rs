@@ -81,7 +81,7 @@ where
         }
 
         match points.cmp(&{ 21 }) {
-            Ordering::Less => Value::Points(points),
+            Ordering::Less => Value::Points(points, aces > 0),
             Ordering::Greater => Value::Bust,
             Ordering::Equal => Value::Blackjack,
         }

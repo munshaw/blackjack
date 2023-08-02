@@ -78,73 +78,73 @@ fn score_four_five_jack() {
             (Rank::Five, Suit::Heart),
             (Rank::Jack, Suit::Diamond),
         ],
-        Value::Points(19),
+        Value::Points(19, false),
     );
 }
 
 #[test]
 fn score_ace() {
-    score_case(vec![(Rank::Ace, Suit::Club)], Value::Points(11));
+    score_case(vec![(Rank::Ace, Suit::Club)], Value::Points(11, true));
 }
 
 #[test]
 fn score_two() {
-    score_case(vec![(Rank::Two, Suit::Club)], Value::Points(2));
+    score_case(vec![(Rank::Two, Suit::Club)], Value::Points(2, false));
 }
 
 #[test]
 fn score_three() {
-    score_case(vec![(Rank::Three, Suit::Club)], Value::Points(3));
+    score_case(vec![(Rank::Three, Suit::Club)], Value::Points(3, false));
 }
 
 #[test]
 fn score_four() {
-    score_case(vec![(Rank::Four, Suit::Club)], Value::Points(4));
+    score_case(vec![(Rank::Four, Suit::Club)], Value::Points(4, false));
 }
 
 #[test]
 fn score_five() {
-    score_case(vec![(Rank::Five, Suit::Club)], Value::Points(5));
+    score_case(vec![(Rank::Five, Suit::Club)], Value::Points(5, false));
 }
 
 #[test]
 fn score_six() {
-    score_case(vec![(Rank::Six, Suit::Club)], Value::Points(6));
+    score_case(vec![(Rank::Six, Suit::Club)], Value::Points(6, false));
 }
 
 #[test]
 fn score_seven() {
-    score_case(vec![(Rank::Seven, Suit::Club)], Value::Points(7));
+    score_case(vec![(Rank::Seven, Suit::Club)], Value::Points(7, false));
 }
 
 #[test]
 fn score_eight() {
-    score_case(vec![(Rank::Eight, Suit::Club)], Value::Points(8));
+    score_case(vec![(Rank::Eight, Suit::Club)], Value::Points(8, false));
 }
 
 #[test]
 fn score_nine() {
-    score_case(vec![(Rank::Nine, Suit::Club)], Value::Points(9));
+    score_case(vec![(Rank::Nine, Suit::Club)], Value::Points(9, false));
 }
 
 #[test]
 fn score_ten() {
-    score_case(vec![(Rank::Ten, Suit::Club)], Value::Points(10));
+    score_case(vec![(Rank::Ten, Suit::Club)], Value::Points(10, false));
 }
 
 #[test]
 fn score_jack() {
-    score_case(vec![(Rank::Jack, Suit::Club)], Value::Points(10));
+    score_case(vec![(Rank::Jack, Suit::Club)], Value::Points(10, false));
 }
 
 #[test]
 fn score_queen() {
-    score_case(vec![(Rank::Queen, Suit::Club)], Value::Points(10));
+    score_case(vec![(Rank::Queen, Suit::Club)], Value::Points(10, false));
 }
 
 #[test]
 fn score_king() {
-    score_case(vec![(Rank::King, Suit::Club)], Value::Points(10));
+    score_case(vec![(Rank::King, Suit::Club)], Value::Points(10, false));
 }
 
 #[test]
@@ -187,6 +187,6 @@ fn score_king_eight_ace() {
             (Rank::Eight, Suit::Spade),
             (Rank::Ace, Suit::Diamond),
         ],
-        Value::Points(19),
+        Value::Points(19, false),
     );
 }

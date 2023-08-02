@@ -1,4 +1,3 @@
-use crate::card::Rank;
 use crate::card_iter::CardIter;
 use crate::card_like::CardLike;
 use crate::draw::{DrawFrom, DrawTo};
@@ -74,12 +73,8 @@ where
         }
     }
 
-    fn has_aces(cards: &H) -> bool {
-        cards.iter().any(|c| c.get_rank() == Rank::Ace)
-    }
-
-    fn is_dealer_staying(&self, points: u8, hand: &H) -> bool {
-        points == 17 && !Self::has_aces(&hand) || points > 17
+    fn is_dealer_staying(&self, points: u8, is_soft: bool) -> bool {
+        points == 17 && !is_soft || points > 17
     }
 
     /// Make the dealer have their turn.
@@ -99,8 +94,8 @@ where
                     self.ui.send(Event::DealerBlackjack);
                     return score;
                 }
-                Value::Points(v) => {
-                    if self.is_dealer_staying(v, &self.dealer_hand) {
+                Value::Points(v, s) => {
+                    if self.is_dealer_staying(v, s) {
                         self.ui.send(Event::DealerStay);
                         return score;
                     }
@@ -118,8 +113,8 @@ where
             (_, Value::Blackjack) => self.ui.send(Event::PlayerLoose),
             (Value::Bust, _) => self.ui.send(Event::PlayerLoose),
             (_, Value::Bust) => self.ui.send(Event::PlayerWin),
-            (Value::Points(p), Value::Points(d)) if p > d => self.ui.send(Event::PlayerWin),
-            (Value::Points(p), Value::Points(d)) if p < d => self.ui.send(Event::PlayerLoose),
+            (Value::Points(p, _), Value::Points(d, _)) if p > d => self.ui.send(Event::PlayerWin),
+            (Value::Points(p, _), Value::Points(d, _)) if p < d => self.ui.send(Event::PlayerLoose),
             _ => unreachable!(),
         }
     }

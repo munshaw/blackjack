@@ -72,7 +72,7 @@ impl Score for FakeHand {
         }
 
         match points.cmp(&{ 21 }) {
-            Ordering::Less => Value::Points(points),
+            Ordering::Less => Value::Points(points, aces > 0),
             Ordering::Greater => Value::Bust,
             Ordering::Equal => Value::Blackjack,
         }
@@ -350,19 +350,18 @@ fn player_ace_king_blackjack_dealer_ace_king() {
 }
 
 #[test]
-fn player_ace_nine_king_four_dealer_ace_six_nine_four() {
+fn player_ace_nine_king_four_dealer_ace_six_queen() {
     let card1 = (Rank::Ace, Suit::Diamond);
     let card2 = (Rank::Nine, Suit::Club);
     let card3 = (Rank::King, Suit::Spade);
     let card4 = (Rank::Four, Suit::Heart);
     let card5 = (Rank::Ace, Suit::Heart);
     let card6 = (Rank::Six, Suit::Diamond);
-    let card7 = (Rank::Nine, Suit::Diamond);
-    let card8 = (Rank::Four, Suit::Spade);
+    let card7 = (Rank::Queen, Suit::Diamond);
     let actions = vec![Action::PlayerHit, Action::PlayerHit, Action::PlayerHit];
     let mut ui = MockInterface::new();
     ui.set_player_actions(actions);
-    let mut deck = mock_deck(vec![card1, card2, card3, card4, card5, card6, card7, card8]);
+    let mut deck = mock_deck(vec![card1, card2, card3, card4, card5, card6, card7]);
     Blackjack::new(
         &mut ui,
         &mut deck,
@@ -380,14 +379,83 @@ fn player_ace_nine_king_four_dealer_ace_six_nine_four() {
         vec![card5],
         vec![card5, card6],
         vec![card5, card6, card7],
-        vec![card5, card6, card7, card8],
     ]);
     ui.verify_player_bust_times(1);
     ui.verify_player_blackjack_times(0);
     ui.verify_dealer_bust_times(0);
     ui.verify_dealer_blackjack_times(0);
     ui.verify_dealer_stay_times(1);
-    ui.verify_dealer_hit_times(3);
+    ui.verify_dealer_hit_times(2);
+    ui.verify_player_win_times(0);
+    ui.verify_player_loose_times(1);
+    ui.verify_tie_times(0);
+}
+
+#[test]
+fn player_seven_ten_stay_dealer_six_ten_nine() {
+    let card1 = (Rank::Seven, Suit::Diamond);
+    let card2 = (Rank::Ten, Suit::Club);
+    let card3 = (Rank::Six, Suit::Diamond);
+    let card4 = (Rank::Ten, Suit::Club);
+    let card5 = (Rank::Nine, Suit::Spade);
+    let actions = vec![Action::PlayerHit, Action::PlayerStay];
+    let mut ui = MockInterface::new();
+    ui.set_player_actions(actions);
+    let mut deck = mock_deck(vec![card1, card2, card3, card4, card5]);
+    Blackjack::new(
+        &mut ui,
+        &mut deck,
+        &mut FakeHand::new(),
+        &mut FakeHand::new(),
+    )
+    .start();
+    ui.verify_player_hands(vec![vec![card1], vec![card1, card2]]);
+    ui.verify_dealer_hands(vec![
+        vec![card3],
+        vec![card3, card4],
+        vec![card3, card4, card5],
+    ]);
+    ui.verify_player_bust_times(0);
+    ui.verify_player_blackjack_times(0);
+    ui.verify_dealer_bust_times(1);
+    ui.verify_dealer_blackjack_times(0);
+    ui.verify_dealer_stay_times(0);
+    ui.verify_dealer_hit_times(2);
+    ui.verify_player_win_times(1);
+    ui.verify_player_loose_times(0);
+    ui.verify_tie_times(0);
+}
+
+#[test]
+fn player_two_ten_stay_dealer_two_six_jack() {
+    let card1 = (Rank::Two, Suit::Diamond);
+    let card2 = (Rank::Six, Suit::Club);
+    let card3 = (Rank::Two, Suit::Heart);
+    let card4 = (Rank::Six, Suit::Diamond);
+    let card5 = (Rank::Jack, Suit::Diamond);
+    let actions = vec![Action::PlayerHit, Action::PlayerStay];
+    let mut ui = MockInterface::new();
+    ui.set_player_actions(actions);
+    let mut deck = mock_deck(vec![card1, card2, card3, card4, card5]);
+    Blackjack::new(
+        &mut ui,
+        &mut deck,
+        &mut FakeHand::new(),
+        &mut FakeHand::new(),
+    )
+    .start();
+    ui.verify_player_hands(vec![vec![card1], vec![card1, card2]]);
+    ui.verify_dealer_hands(vec![
+        vec![card3],
+        vec![card3, card4],
+        vec![card3, card4, card5],
+    ]);
+    ui.verify_player_bust_times(0);
+    ui.verify_player_blackjack_times(0);
+    ui.verify_dealer_bust_times(0);
+    ui.verify_dealer_blackjack_times(0);
+    ui.verify_dealer_stay_times(1);
+    ui.verify_dealer_hit_times(2);
     ui.verify_player_win_times(0);
     ui.verify_player_loose_times(1);
     ui.verify_tie_times(0);
