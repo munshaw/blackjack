@@ -1,8 +1,8 @@
-use crate::card_iter::CardIter;
-use crate::card_like::CardLike;
-use crate::draw::{DrawFrom, DrawTo};
-use crate::interface::{Action, Event, Interface};
-use crate::score::{Score, Value};
+use crate::behaviour::card_iter::CardIter;
+use crate::behaviour::card_like::CardLike;
+use crate::behaviour::draw::{DrawFrom, DrawTo};
+use crate::behaviour::interface::{Action, Event, Interface};
+use crate::behaviour::score::{Score, Value};
 use std::marker::PhantomData;
 
 /// Represents a game of single deck blackjack.

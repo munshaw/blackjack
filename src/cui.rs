@@ -1,5 +1,5 @@
-use crate::card_iter::CardIter;
-use crate::interface::{Action, Event, Interface};
+use crate::behaviour::card_iter::CardIter;
+use crate::behaviour::interface::{Action, Event, Interface};
 use std::fmt::Display;
 use std::io::stdin;
 

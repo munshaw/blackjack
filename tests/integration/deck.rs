@@ -1,6 +1,6 @@
+use blackjack::behaviour::draw::DrawFrom;
 use blackjack::card::Card;
 use blackjack::deck::Deck;
-use blackjack::draw::DrawFrom;
 use std::collections::HashSet;
 
 #[test]

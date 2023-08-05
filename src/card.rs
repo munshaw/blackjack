@@ -1,4 +1,4 @@
-use crate::card_like::CardLike;
+use crate::behaviour::card_like::CardLike;
 use std::fmt::{Display, Formatter};
 
 /// Playing card ranks.

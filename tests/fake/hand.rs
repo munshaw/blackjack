@@ -1,8 +1,8 @@
+use blackjack::behaviour::card_iter::CardIter;
+use blackjack::behaviour::card_like::{CardLike, MockCardLike};
+use blackjack::behaviour::draw::{CannotDrawFromEmpty, DrawFrom, DrawTo, MockDrawFrom};
+use blackjack::behaviour::score::{Score, Value};
 use blackjack::card::Rank;
-use blackjack::card_iter::CardIter;
-use blackjack::card_like::{CardLike, MockCardLike};
-use blackjack::draw::{CannotDrawFromEmpty, DrawFrom, DrawTo, MockDrawFrom};
-use blackjack::score::{Score, Value};
 use std::cmp::Ordering;
 use std::slice::Iter;
 

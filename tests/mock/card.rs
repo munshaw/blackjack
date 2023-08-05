@@ -1,5 +1,5 @@
+use blackjack::behaviour::card_like::MockCardLike;
 use blackjack::card::{Rank, Suit};
-use blackjack::card_like::MockCardLike;
 
 pub fn mock_card(card: &(Rank, Suit)) -> MockCardLike {
     let mut mock_card = MockCardLike::new();

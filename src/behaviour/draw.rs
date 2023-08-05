@@ -1,4 +1,4 @@
-use crate::card_like::CardLike;
+use crate::behaviour::card_like::CardLike;
 use mockall::automock;
 
 /// Error used when attempting to draw a card from an empty card collection.

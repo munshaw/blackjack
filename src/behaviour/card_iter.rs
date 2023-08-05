@@ -1,4 +1,4 @@
-use crate::card_like::CardLike;
+use crate::behaviour::card_like::CardLike;
 use std::slice::Iter;
 
 /// The ability to iterate through cards.

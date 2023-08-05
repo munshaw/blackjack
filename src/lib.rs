@@ -1,17 +1,5 @@
-/// Enums and traits for blackjack user interfaces.
-pub mod interface;
-
-/// Traits for drawing to/from a collection of cards.
-pub mod draw;
-
-/// Trait for scoring a hand.
-pub mod score;
-
-/// Trait for iterating through a collection of cards.
-pub mod card_iter;
-
-/// Trait for playing card like entities
-pub mod card_like;
+/// Traits and enums for blackjack behaviours.
+pub mod behaviour;
 
 /// Implementation of single deck blackjack.
 pub mod blackjack;

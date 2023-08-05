@@ -1,4 +1,4 @@
-use crate::card_iter::CardIter;
+use crate::behaviour::card_iter::CardIter;
 
 /// Actions that the user may take on their turn.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
