@@ -47,3 +47,27 @@ fn score_one_card() {
         assert!(false)
     }
 }
+
+#[test]
+fn iterate_through_five_cards() {
+    let mut deck = Deck::new();
+    let mut hand = Hand::new();
+
+    for _ in 0..5 {
+        hand.draw_from(&mut deck).unwrap();
+    }
+
+    assert_eq!(5, hand.iter().count())
+}
+
+#[test]
+fn iterate_through_all_cards() {
+    let mut deck = Deck::new();
+    let mut hand = Hand::new();
+
+    for _ in 0..52 {
+        hand.draw_from(&mut deck).unwrap();
+    }
+
+    assert_eq!(52, hand.iter().count())
+}
