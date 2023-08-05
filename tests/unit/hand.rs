@@ -1,23 +1,11 @@
+use crate::mock::deck::mock_deck;
 use blackjack::card::{Rank, Suit};
 use blackjack::card_iter::CardIter;
 use blackjack::card_like::{CardLike, MockCardLike};
-use blackjack::draw::{CannotDrawFromEmpty, DrawTo, MockDrawFrom};
+use blackjack::draw::{CannotDrawFromEmpty, DrawTo};
 use blackjack::hand::Hand;
 use blackjack::score::{Score, Value};
 use std::collections::HashSet;
-
-fn mock_card(card: &(Rank, Suit)) -> MockCardLike {
-    let mut mock_card = MockCardLike::new();
-    mock_card.expect_get_rank().return_const(card.0);
-    mock_card.expect_get_suit().return_const(card.1);
-    mock_card
-}
-
-fn mock_deck(mut cards: Vec<MockCardLike>) -> MockDrawFrom<MockCardLike> {
-    let mut deck = MockDrawFrom::new();
-    deck.expect_draw().returning(move || cards.pop());
-    deck
-}
 
 fn assert_one_new_card_in_hand(
     initial_cards: &HashSet<(Rank, Suit)>,
@@ -40,12 +28,13 @@ fn assert_one_new_card_in_hand(
 
 #[test]
 fn draw_and_iter() {
-    let initial_cards = HashSet::from([
+    let initial_cards = [
         (Rank::King, Suit::Club),
         (Rank::Eight, Suit::Heart),
         (Rank::Four, Suit::Diamond),
-    ]);
-    let mut deck = mock_deck(initial_cards.iter().map(|c| mock_card(c)).collect());
+    ];
+    let mut deck = mock_deck(Vec::from(initial_cards));
+    let initial_cards = HashSet::from(initial_cards);
     let mut last_hand = HashSet::new();
     let mut actual_hand = Hand::new();
 
@@ -62,11 +51,9 @@ fn draw_and_iter() {
 }
 
 fn score_case(cards: Vec<(Rank, Suit)>, expected_score: Value) {
-    let mut deck = mock_deck(cards.iter().map(|c| mock_card(c)).collect());
+    let mut deck = mock_deck(cards);
     let mut hand = Hand::new();
-    for _ in cards {
-        hand.draw_from(&mut deck).unwrap();
-    }
+    while hand.draw_from(&mut deck).is_ok() {}
     assert_eq!(expected_score, hand.score())
 }
 

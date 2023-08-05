@@ -1,83 +1,10 @@
+use crate::fake::hand::FakeHand;
+use crate::mock::deck::mock_deck;
 use blackjack::blackjack::Blackjack;
 use blackjack::card::{Rank, Suit};
 use blackjack::card_iter::CardIter;
-use blackjack::card_like::{CardLike, MockCardLike};
-use blackjack::draw::{CannotDrawFromEmpty, DrawFrom, DrawTo, MockDrawFrom};
+use blackjack::card_like::CardLike;
 use blackjack::interface::{Action, Event, Interface};
-use blackjack::score::{Score, Value};
-use std::cmp::Ordering;
-use std::slice::Iter;
-
-struct FakeHand(Vec<MockCardLike>);
-
-impl FakeHand {
-    fn new() -> FakeHand {
-        FakeHand(Vec::new())
-    }
-}
-
-impl CardIter for FakeHand {
-    type Card = MockCardLike;
-
-    fn iter(&self) -> Iter<'_, Self::Card> {
-        self.0.iter()
-    }
-}
-
-impl DrawTo<MockCardLike, MockDrawFrom<MockCardLike>> for FakeHand {
-    fn draw_from(
-        &mut self,
-        cards: &mut MockDrawFrom<MockCardLike>,
-    ) -> Result<(), CannotDrawFromEmpty> {
-        match cards.draw() {
-            None => Err(CannotDrawFromEmpty),
-            Some(card) => {
-                self.0.push(card);
-                Ok(())
-            }
-        }
-    }
-}
-
-impl Score for FakeHand {
-    fn score(&self) -> Value {
-        let mut points = 0;
-        let mut aces = 0;
-
-        for card in &self.0[0..] {
-            points += match card.get_rank() {
-                Rank::Ace => {
-                    aces += 1;
-                    11
-                }
-                Rank::Two => 2,
-                Rank::Three => 3,
-                Rank::Four => 4,
-                Rank::Five => 5,
-                Rank::Six => 6,
-                Rank::Seven => 7,
-                Rank::Eight => 8,
-                Rank::Nine => 9,
-                Rank::Ten => 10,
-                Rank::Jack => 10,
-                Rank::Queen => 10,
-                Rank::King => 10,
-            };
-        }
-
-        // Try valuing aces at 1 to avoid busting.
-        while points > 21 && aces > 0 {
-            points -= 10;
-            aces -= 1;
-        }
-
-        match points.cmp(&{ 21 }) {
-            Ordering::Less => Value::Points(points, aces > 0),
-            Ordering::Greater => Value::Bust,
-            Ordering::Equal => Value::Blackjack,
-        }
-    }
-}
 
 struct MockInterface {
     player_actions: Vec<Action>,
@@ -186,22 +113,6 @@ impl Interface<FakeHand> for MockInterface {
                 .push(hand.iter().map(|c| (c.get_rank(), c.get_suit())).collect()),
         }
     }
-}
-
-fn mock_deck(cards: Vec<(Rank, Suit)>) -> MockDrawFrom<MockCardLike> {
-    let mut deck = MockDrawFrom::new();
-    let mut mock_cards: Vec<MockCardLike> = cards
-        .iter()
-        .rev()
-        .map(|c| {
-            let mut mock_card = MockCardLike::new();
-            mock_card.expect_get_rank().return_const(c.0);
-            mock_card.expect_get_suit().return_const(c.1);
-            mock_card
-        })
-        .collect();
-    deck.expect_draw().returning(move || mock_cards.pop());
-    deck
 }
 
 #[test]
