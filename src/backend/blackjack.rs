@@ -52,29 +52,22 @@ where
 
     /// Make the player have their turn.
     fn player_turn(&mut self) -> Value {
-        loop {
-            self.player_hand
-                .draw_from(self.deck)
-                .expect("Cannot draw from empty deck.");
-            self.ui.send(Event::PlayerHand(&self.player_hand));
-            let score = self.player_hand.score();
-            match score {
-                Value::Bust => {
-                    self.ui.send(Event::PlayerBust);
-                    return score;
-                }
-                Value::Blackjack => {
-                    self.ui.send(Event::PlayerBlackjack);
-                    return score;
-                }
-                _ if Action::PlayerStay == self.ui.get_action() => return score,
-                _ => {}
-            };
-        }
+        self.player_hand
+            .draw_from(self.deck)
+            .expect("Can't draw from empty deck.");
+        self.ui.send(Event::PlayerHand(&self.player_hand));
+        let score = self.player_hand.score();
+        match score {
+            Value::Bust => self.ui.send(Event::PlayerBust),
+            Value::Blackjack => self.ui.send(Event::PlayerBlackjack),
+            _ if Action::PlayerHit == self.ui.get_action() => return self.player_turn(),
+            _ => {}
+        };
+        score
     }
 
-    fn is_dealer_staying(&self, points: u8, is_soft: bool) -> bool {
-        points == 17 && !is_soft || points > 17
+    fn is_dealer_hitting(&self, points: u8, is_soft: bool) -> bool {
+        points < 17 || is_soft && points == 17
     }
 
     /// Make the dealer have their turn.
@@ -82,26 +75,19 @@ where
         loop {
             self.dealer_hand
                 .draw_from(self.deck)
-                .expect("Cannot draw from empty deck.");
+                .expect("Can't draw from empty deck.");
             self.ui.send(Event::DealerHand(&self.dealer_hand));
             let score = self.dealer_hand.score();
             match score {
-                Value::Bust => {
-                    self.ui.send(Event::DealerBust);
-                    return score;
-                }
-                Value::Blackjack => {
-                    self.ui.send(Event::DealerBlackjack);
-                    return score;
-                }
-                Value::Points(v, s) => {
-                    if self.is_dealer_staying(v, s) {
-                        self.ui.send(Event::DealerStay);
-                        return score;
-                    }
+                Value::Bust => self.ui.send(Event::DealerBust),
+                Value::Blackjack => self.ui.send(Event::DealerBlackjack),
+                Value::Points(s, v) if self.is_dealer_hitting(s, v) => {
                     self.ui.send(Event::DealerHit);
+                    continue;
                 }
-            };
+                _ => self.ui.send(Event::DealerStay),
+            }
+            return score;
         }
     }
 
