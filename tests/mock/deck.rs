@@ -1,7 +1,7 @@
 use crate::mock::card::mock_card;
+use blackjack::backend::card::{Rank, Suit};
 use blackjack::behaviour::card_like::MockCardLike;
 use blackjack::behaviour::draw::MockDrawFrom;
-use blackjack::card::{Rank, Suit};
 
 pub fn mock_deck(cards: Vec<(Rank, Suit)>) -> MockDrawFrom<MockCardLike> {
     let mut deck = MockDrawFrom::new();

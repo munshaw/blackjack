@@ -1,7 +1,7 @@
-use blackjack::blackjack::Blackjack;
+use blackjack::backend::blackjack::Blackjack;
+use blackjack::backend::deck::Deck;
+use blackjack::backend::hand::Hand;
 use blackjack::cui::Cui;
-use blackjack::deck::Deck;
-use blackjack::hand::Hand;
 
 fn main() {
     Blackjack::new(

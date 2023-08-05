@@ -1,10 +1,10 @@
 use crate::mock::deck::mock_deck;
+use blackjack::backend::card::{Rank, Suit};
+use blackjack::backend::hand::Hand;
 use blackjack::behaviour::card_iter::CardIter;
 use blackjack::behaviour::card_like::{CardLike, MockCardLike};
 use blackjack::behaviour::draw::{CannotDrawFromEmpty, DrawTo};
 use blackjack::behaviour::score::{Score, Value};
-use blackjack::card::{Rank, Suit};
-use blackjack::hand::Hand;
 use std::collections::HashSet;
 
 fn assert_one_new_card_in_hand(

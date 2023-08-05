@@ -1,9 +1,9 @@
+use blackjack::backend::deck::Deck;
+use blackjack::backend::hand::Hand;
 use blackjack::behaviour::card_iter::CardIter;
 use blackjack::behaviour::draw::{CannotDrawFromEmpty, DrawTo};
 use blackjack::behaviour::score::Score;
 use blackjack::behaviour::score::Value::Points;
-use blackjack::deck::Deck;
-use blackjack::hand::Hand;
 
 #[test]
 fn draw_one_card() {

@@ -1,10 +1,10 @@
 use crate::fake::hand::FakeHand;
 use crate::mock::deck::mock_deck;
+use blackjack::backend::blackjack::Blackjack;
+use blackjack::backend::card::{Rank, Suit};
 use blackjack::behaviour::card_iter::CardIter;
 use blackjack::behaviour::card_like::CardLike;
 use blackjack::behaviour::interface::{Action, Event, Interface};
-use blackjack::blackjack::Blackjack;
-use blackjack::card::{Rank, Suit};
 
 struct MockInterface {
     player_actions: Vec<Action>,

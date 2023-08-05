@@ -1,4 +1,4 @@
-use crate::card::{Rank, Suit};
+use crate::backend::card::{Rank, Suit};
 use mockall::automock;
 
 /// A trait for something to act as a playing card.

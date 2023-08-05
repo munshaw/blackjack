@@ -1,17 +1,8 @@
 /// Traits and enums for blackjack behaviours.
 pub mod behaviour;
 
-/// Implementation of single deck blackjack.
-pub mod blackjack;
+/// Implementation of backend blackjack behaviours.
+pub mod backend;
 
-/// CUI implementation of the blackjack user interface.
+/// Implementation of blackjack cui frontend.
 pub mod cui;
-
-/// Functionality related to playing cards.
-pub mod card;
-
-/// Functionality related to hands of playing cards.
-pub mod hand;
-
-/// Functionality related to decks of playing cards.
-pub mod deck;

@@ -1,5 +1,5 @@
+use blackjack::backend::card::{Card, Rank, Suit};
 use blackjack::behaviour::card_like::CardLike;
-use blackjack::card::{Card, Rank, Suit};
 
 const RANKS: [Rank; 13] = [
     Rank::Ace,

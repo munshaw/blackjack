@@ -1,8 +1,8 @@
+use crate::backend::card::Rank;
 use crate::behaviour::card_iter::CardIter;
 use crate::behaviour::card_like::CardLike;
 use crate::behaviour::draw::{CannotDrawFromEmpty, DrawFrom, DrawTo};
 use crate::behaviour::score::{Score, Value};
-use crate::card::Rank;
 use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
 use std::slice::Iter;
